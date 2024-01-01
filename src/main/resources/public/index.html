@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadanka</title>
+    <style>
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/">index</a>
+        <a href="/cars.html">edit/update cars</a>
+        <a href="/admin.html">generative invoice</a>
+        <a href="/search.html">search invoices</a>
+    </header>
+    <main>
+        <div id="left">
+            <button id="send">Dodaj na serwer</button>
+        </div>
+        <div id="right">
+            <form>
+                <input type="text" name="model" id="model"> model </br>
+                <select name="rok" id="rok">
+                    <option value="2001">2001</option>
+                    <option value="2002">2002</option>
+                    <option value="2003">2003</option>
+                    <option value="2004">2004</option>
+                    <option value="2005">2005</option>
+                </select> rok </br>
+                <input type="checkbox" name="poduszkaK" id="k"> kierowca </br>
+                <input type="checkbox" name="poduszkaP" id="p"> pasazer </br>
+                <input type="checkbox" name="poduszkaT" id="t"> tylna kanapa </br>
+                <input type="checkbox" name="poduszkaB" id="b"> boczne z tyłu </br>
+                <input type="color" name="kolor" id="kolor"> kolor
+            </form>
+        </div>
+    </main>
+    <script defer>
+        document.getElementById("send").onclick = async () => {
+            let json = await fetchPostAsync()
+            alert(JSON.stringify(json, null, 5))
+        }
+
+        fetchPostAsync = async () => {
+            const data = JSON.stringify({
+                model: document.getElementById("model").value,
+                year: document.getElementById("rok").value,
+                color: document.getElementById("kolor").value,
+                airbags: [
+                    {description: "kierowca", val:document.getElementById("k").checked},
+                    {description: "pasazer", val:document.getElementById("p").checked},
+                    {description: "tylna kanapa", val:document.getElementById("t").checked},
+                    {description: "boczne z tyłu", val:document.getElementById("b").checked}
+                ]
+            })
+
+            const options = {
+                method: "POST",
+                body: data,
+            };
+
+            let response = await fetch("/add", options)
+
+            if (!response.ok)
+                return response.status
+            else
+                return await response.json() // response.json
+
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Zadanka</title>
+    <style>
+        main {
+            display: flex;
+            flex-direction: row;
+        }
+
+        #faktury {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #faktury * {
+            margin-top: 10px;
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body onload="start()">
+    <header>
+        <a href="/">index</a>
+        <a href="/cars.html">edit/update cars</a>
+        <a href="/admin.html">generative invoice</a>
+        <a href="/search.html">search invoices</a>
+    </header>
+    <main>
+        <div id="faktury">
+            <button id="klik">Generuj losowo samochody</button>
+            <hr>
+            <button id="fAll">Faktura za wszystko</button>
+            <div></div>
+            <hr>
+            <button id="fYear">Faktura z rocznika</button>
+            <select name="sYear" id="sYear">
+                <option value="2001">2001</option>
+                <option value="2002">2002</option>
+                <option value="2003">2003</option>
+                <option value="2004">2004</option>
+                <option value="2005">2005</option>
+                <option value="2006">2006</option>
+                <option value="2007">2007</option>
+                <option value="2008">2008</option>
+                <option value="2009">2009</option>
+            </select>
+            <div></div>
+            <hr>
+            <button id="fValue">Faktura z przedziału cenowego</button>
+            <input type="text" id="minimum" placeholder="od">
+            <input type="text" id="maximum" placeholder="do">
+            <div></div>
+        </div>
+        <ul id="list" style="list-style: none">
+
+        </ul>
+    </main>
+    <script defer>
+        document.getElementById("klik").addEventListener("click", () => fetchPostAsync())
+        let l = document.getElementById("list")
+        l.style.width = "80%"
+
+        document.getElementById("fAll").addEventListener("click", () => fetchFakturaAll())
+        fetchFakturaAll = async () => {
+            const options = {
+                method: "POST",
+            };
+
+            let response = await fetch("/invoiceAll", options)
+
+            if (!response.ok)
+                return response.status
+            else {
+                start()
+                return await response.json()
+            }
+        }
+
+        document.getElementById("fYear").addEventListener("click", () => fetchFakturaYear())
+        fetchFakturaYear = async () => {
+            let data = new FormData(document.getElementById("sYear"))
+            const options = {
+                method: "POST",
+                body: data
+            };
+
+            let response = await fetch("/invoiceYear", options)
+
+            if (!response.ok)
+                return response.status
+            else {
+                start()
+                return await response.json()
+            }
+        }
+
+        document.getElementById("fValue").addEventListener("click", () => fetchFakturaValue())
+        fetchFakturaValue = async () => {
+            const options = {
+                method: "POST",
+                body: { min: document.getElementById("minimum").value, max: document.getElementById("maximum").value }
+            };
+
+            let response = await fetch("/invoiceValue", options)
+
+            if (!response.ok)
+                return response.status
+            else {
+                start()
+                return await response.json()
+            }
+        }
+
+        start = async () => {
+            l.innerHTML = ""
+            let tab = await fetchGet()
+            for (let i = 0; i < tab.length; i++) {
+                let el = document.createElement("li")
+                let id = document.createElement("div")
+                let uuid = document.createElement("div")
+                let model = document.createElement("div")
+                let year = document.createElement("div")
+                let airbags = document.createElement("div")
+                let color = document.createElement("div")
+                let buy = document.createElement("div")
+                let value = document.createElement("div")
+                let pVat = document.createElement("div")
+                let img = document.createElement("img")
+
+                el.style.display = "flex"
+                el.style.width = "100%"
+                el.style.marginBottom = "20px"
+                id.innerText = tab[i].id
+                id.style.margin = "auto"
+
+                uuid.innerText = tab[i].uuid
+                uuid.style.margin = "auto"
+
+                model.innerText = tab[i].model
+                model.style.margin = "auto"
+
+                year.innerText = tab[i].year
+                year.style.margin = "auto"
+
+                let text = ""
+                for (let j = 0; j < tab[i].airbags.length; j++) {
+                    text += tab[i].airbags[j].description + ":" + tab[i].airbags[j].val + "<br>"
+                }
+                airbags.innerHTML = text
+                airbags.style.margin = "auto"
+
+                color.style.width = "20px"
+                color.style.height = "20px"
+                color.style.backgroundColor = tab[i].color
+                color.style.margin = "auto"
+                color.style.border = "1px solid black"
+
+                if (tab[i].buy) {
+                    buy.innerText = tab[i].buy.day + "/" + tab[i].buy.month + "/" + tab[i].buy.year
+                    buy.style.margin = "auto"
+
+                    value.innerText = tab[i].value
+                    value.style.margin = "auto"
+
+                    pVat.innerText = tab[i].pVat
+                    pVat.style.margin = "auto"
+
+                    img.src = './templateCars/' + tab[i].model + '.jpg'
+                    img.style.width = "50px"
+                    img.style.height = "50px"
+                } else {
+                    buy.innerText = "brak danych"
+                    buy.style.margin = "auto"
+
+                    value.innerText = "brak danych"
+                    value.style.margin = "auto"
+
+                    pVat.innerText = "brak danych"
+                    pVat.style.margin = "auto"
+
+                    img.alt = "brak danych"
+                    img.style.width = "50px"
+                    img.style.height = "50px"
+                }
+
+
+                el.append(id, uuid, model, year, airbags, color, buy, value, pVat, img)
+                l.appendChild(el)
+            }
+        }
+
+        fetchPostAsync = async () => {
+            const options = {
+                method: "POST",
+            };
+
+            let response = await fetch("/generate", options)
+
+            if (!response.ok)
+                return response.status
+            else {
+                start()
+                return await response.json()
+            }
+
+        }
+
+        fetchGet = async () => {
+            const options = {
+                method: "GET",
+            };
+
+            let response = await fetch("/get", options)
+
+            if (!response.ok)
+                return response.status
+            else
+                return await response.json() // response.json
+
+        }
+    </script>
+</body>
+
+</html>

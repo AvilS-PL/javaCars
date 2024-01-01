@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadanka</title>
+    <style>
+    </style>
+</head>
+<body onload="start()">
+    <header>
+        <a href="/">index</a>
+        <a href="/cars.html">edit/update cars</a>
+        <a href="/admin.html">generative invoice</a>
+        <a href="/search.html">search invoices</a>
+    </header>
+    <main>
+        <button id="klik">Klik</button>
+        <ul id="list" style="list-style: none">
+
+        </ul>
+    </main>
+    <script defer>
+        document.getElementById("klik").addEventListener("click", ()=> fetchPostAsync())
+        let l = document.getElementById("list")
+
+        start = async () => {
+            l.innerHTML = ""
+            let tab = await fetchGet()
+            for (let i = 0; i < tab.length ; i++) {
+                let el = document.createElement("li")
+                let id = document.createElement("div")
+                let uuid = document.createElement("div")
+                let model = document.createElement("div")
+                let year = document.createElement("div")
+                let airbags = document.createElement("div")
+                let color = document.createElement("div")
+                let create = document.createElement("button")
+
+                el.style.display = "flex"
+                el.style.width = "80%"
+                el.style.marginBottom = "20px"
+                id.innerText = tab[i].id
+                id.style.margin ="auto"
+
+                uuid.innerText = tab[i].uuid
+                uuid.style.margin ="auto"
+
+                model.innerText = tab[i].model
+                model.style.margin ="auto"
+
+                year.innerText = tab[i].year
+                year.style.margin ="auto"
+
+                let text = ""
+                for (let j = 0; j < tab[i].airbags.length; j++) {
+                    text += tab[i].airbags[j].description + ":" + tab[i].airbags[j].val + "<br>"
+                }
+                airbags.innerHTML = text
+                airbags.style.margin ="auto"
+
+                color.style.width = "20px"
+                color.style.height = "20px"
+                color.style.backgroundColor = tab[i].color
+                color.style.margin = "auto"
+                color.style.border = "1px solid black"
+
+                create.innerText = "generuj fakturkę VAT"
+                create.style.margin="auto"
+                create.addEventListener("click", ()=> creater(tab[i]))
+
+                el.append(id, uuid, model, year, airbags, color, create)
+                if (tab[i].vat) {
+                    let temp = document.createElement("a")
+                    temp.innerText = "Pobierz fakturkę"
+                    temp.style.margin = "auto"
+                    temp.href = "http://localhost:4567/invoice?uuid=" + tab[i].uuid
+                    el.append(temp)
+                }
+                l.appendChild(el)
+            }
+        }
+
+        creater = async (element) => {
+            await fetchPostInvoiceAsync(element.uuid)
+        }
+
+        fetchPostInvoiceAsync = async (uuid) => {
+            const data = JSON.stringify({
+                uuid: uuid
+            })
+
+            const options = {
+                method: "POST",
+                body: data
+            };
+
+            let response = await fetch("/invoice", options)
+
+            if (!response.ok)
+                return response.status
+            else {
+                start()
+                return await response.json()
+            }
+
+        }
+
+        fetchPostAsync = async () => {
+            const options = {
+                method: "POST",
+            };
+
+            let response = await fetch("/generate", options)
+
+            if (!response.ok)
+                return response.status
+            else {
+                start()
+                return await response.json()
+            }
+
+        }
+
+        fetchGet = async () => {
+            const options = {
+                method: "GET",
+            };
+
+            let response = await fetch("/get", options )
+
+            if (!response.ok)
+                return response.status
+            else
+                return await response.json() // response.json
+
+        }
+    </script>
+</body>
+</html>
