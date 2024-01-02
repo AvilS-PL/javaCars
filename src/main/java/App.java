@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import static spark.Spark.*;
 
@@ -71,38 +68,81 @@ class App {
         post("/invoice", (req,res)-> invoiceCar(req,res));
         get("/invoice", (req,res)-> getInvoice(req,res));
         post("/invoiceAll", (req,res)-> invoiceAll(req,res));
+        post("/invoiceYear", (req,res)-> invoiceYear(req,res));
+        post("/invoiceValue", (req,res)-> invoiceValue(req,res));
+        get("/invoices", (req,res)-> getInvoices(req,res));
 
     }
 
-    private static Object invoiceAll(Request req, Response res) {
+    private static Object getInvoices(Request req, Response res) {
 
+        Map<String, ArrayList<Invoice>> map = new HashMap<>();
+        map.put("all", invoices.getAll());
+        map.put("year", invoices.getYear());
+        map.put("value", invoices.getValue());
+
+        res.type("application/json");
+        return gson.toJson(map);
+    }
+
+    private static Object invoiceValue(Request req, Response res) {
+        ArrayList<Car> tempCars = new ArrayList<Car>();
+        double max = gson.fromJson(req.body(), Price.class).getMax();
+        double min = gson.fromJson(req.body(), Price.class).getMin();
+        if (max < min) {
+            max = gson.fromJson(req.body(), Price.class).getMin();
+            min = gson.fromJson(req.body(), Price.class).getMax();
+        }
+        for(int i = 0;i<cars.size();i++) {
+            if (cars.get(i).getValue() >= min && cars.get(i).getValue() <= max) {
+                tempCars.add(cars.get(i));
+            }
+        }
+        Invoice faktura = new Invoice(System.currentTimeMillis(),"invoice_value","firma sprzedająca", "nabywca", tempCars, "auta o wartościach: " + (int) min + "-" + (int) max + " PLN");
+        faktura.generateInvoice();
+        invoices.addValue(faktura);
+        res.type("application/json");
+        return gson.toJson("generated value invoices");
+    }
+
+    private static Object invoiceYear(Request req, Response res) {
+        ArrayList<Car> tempCars = new ArrayList<Car>();
+        for(int i = 0;i<cars.size();i++) {
+            if (cars.get(i).getYear().equals(gson.fromJson(req.body(), Car.class).getYear())) {
+                tempCars.add(cars.get(i));
+            }
+        }
+        Invoice faktura = new Invoice(System.currentTimeMillis(),"invoice_year","firma sprzedająca", "nabywca", tempCars, "auta z roku " + gson.fromJson(req.body(), Car.class).getYear());
+        faktura.generateInvoice();
+        invoices.addYear(faktura);
+        res.type("application/json");
+        return gson.toJson("generated year invoices");
+    }
+
+    private static Object invoiceAll(Request req, Response res) {
         Invoice faktura = new Invoice(System.currentTimeMillis(),"invoice_all","firma sprzedająca", "nabywca", cars, "wszystkie auta");
         faktura.generateInvoice();
+        invoices.addAll(faktura);
         res.type("application/json");
-        return(JsonParser.parseString("downloaded"));
+        return gson.toJson("generated all invoices");
     }
 
     private static Object getInvoice(Request req, Response res) {
         OutputStream outputStream = null;
-        for(int i = 0;i<cars.size();i++) {
-            if (cars.get(i).getUuid().equals(req.queryParams("uuid"))) {
-                res.type("application/octet-stream");
-                res.header("Content-Disposition", "attachment; filename="+cars.get(i).getUuid()+".pdf");
-                try {
-                    outputStream = res.raw().getOutputStream();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    outputStream.write(Files.readAllBytes(Path.of("katalog/"+cars.get(i).getUuid()+".pdf")));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        res.type("application/octet-stream");
+        res.header("Content-Disposition", "attachment; filename="+req.queryParams("name")+".pdf");
+        try {
+            outputStream = res.raw().getOutputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
+        try {
+            outputStream.write(Files.readAllBytes(Path.of(req.queryParams("path")+"/"+req.queryParams("name")+".pdf")));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         res.type("application/json");
-        return(JsonParser.parseString("downloaded"));
+        return gson.toJson("downloaded");
     }
 
     private static Object invoiceCar(Request req, Response res) {
@@ -173,7 +213,7 @@ class App {
             }
         }
         res.type("application/json");
-        return(JsonParser.parseString("invoiced"));
+        return gson.toJson("invoiced");
     }
 
     private static Object generateCars(Request req, Response res) {
@@ -199,7 +239,7 @@ class App {
             cars.get(cars.toArray().length - 1).setpVat(perVat.get((int) (Math.random()*perVat.size())));
         }
         res.type("application/json");
-        return(JsonParser.parseString("generated"));
+        return gson.toJson("generated");
     }
 
     private static Object deleteCar(Request req, Response res) {
@@ -208,7 +248,8 @@ class App {
                 cars.remove(i);
             }
         }
-        return (JsonParser.parseString("deleted"));
+        res.type("application/json");
+        return gson.toJson("removed");
     }
 
 
@@ -220,7 +261,7 @@ class App {
             }
         }
         res.type("application/json");
-        return (JsonParser.parseString("edited"));
+        return gson.toJson("edited");
     }
 
     private static Object getCars(Request req, Response res) {

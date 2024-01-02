@@ -91,7 +91,7 @@
 
         deleter = async (element) => {
             let json = await fetchPostAsync(element.uuid)
-            console.log(json)
+            console.log(JSON.stringify(json))
             start()
         }
 
@@ -109,7 +109,7 @@
         editorSend = async () => {
             document.getElementById("d1").close()
             let json = await fetchPatchAsync()
-            console.log(json)
+            console.log(JSON.stringify(json))
             start()
         }
 

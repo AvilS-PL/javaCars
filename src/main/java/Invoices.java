@@ -3,15 +3,21 @@ import java.util.ArrayList;
 public class Invoices {
     private ArrayList<Invoice> all,year,value;
 
-    public void setAll(Invoice one) {
+    public Invoices() {
+        this.all = new ArrayList<Invoice>();
+        this.year = new ArrayList<Invoice>();
+        this.value = new ArrayList<Invoice>();
+    }
+
+    public void addAll(Invoice one) {
         this.all.add(one);
     }
 
-    public void setYear(Invoice one) {
+    public void addYear(Invoice one) {
         this.year.add(one);
     }
 
-    public void setValue(Invoice one) {
+    public void addValue(Invoice one) {
         this.value.add(one);
     }
 

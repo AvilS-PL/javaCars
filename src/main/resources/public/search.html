@@ -36,10 +36,11 @@
             <button id="klik">Generuj losowo samochody</button>
             <hr>
             <button id="fAll">Faktura za wszystko</button>
-            <div></div>
+            <div id="aAll"></div>
             <hr>
             <button id="fYear">Faktura z rocznika</button>
             <select name="sYear" id="sYear">
+                <option value="2000">2000</option>
                 <option value="2001">2001</option>
                 <option value="2002">2002</option>
                 <option value="2003">2003</option>
@@ -50,12 +51,12 @@
                 <option value="2008">2008</option>
                 <option value="2009">2009</option>
             </select>
-            <div></div>
+            <div id="aYear"></div>
             <hr>
             <button id="fValue">Faktura z przedziału cenowego</button>
-            <input type="text" id="minimum" placeholder="od">
-            <input type="text" id="maximum" placeholder="do">
-            <div></div>
+            <input type="text" id="minimum" >
+            <input type="text" id="maximum" >
+            <div id="aValue"></div>
         </div>
         <ul id="list" style="list-style: none">
 
@@ -84,7 +85,9 @@
 
         document.getElementById("fYear").addEventListener("click", () => fetchFakturaYear())
         fetchFakturaYear = async () => {
-            let data = new FormData(document.getElementById("sYear"))
+            const data = JSON.stringify({
+                year: document.getElementById("sYear").value
+            })
             const options = {
                 method: "POST",
                 body: data
@@ -102,9 +105,13 @@
 
         document.getElementById("fValue").addEventListener("click", () => fetchFakturaValue())
         fetchFakturaValue = async () => {
+            const data = JSON.stringify({
+                min: document.getElementById("minimum").value,
+                max: document.getElementById("maximum").value
+            })
             const options = {
                 method: "POST",
-                body: { min: document.getElementById("minimum").value, max: document.getElementById("maximum").value }
+                body: data
             };
 
             let response = await fetch("/invoiceValue", options)
@@ -120,6 +127,38 @@
         start = async () => {
             l.innerHTML = ""
             let tab = await fetchGet()
+            let invoices = await fetchGet2()
+            console.log(invoices)
+            let aAll = document.getElementById("aAll")
+            aAll.innerHTML = ""
+            for (let i = 0; i < invoices.all.length; i++) {
+                let link = document.createElement("a")
+                link.innerText = "pobierz"
+                let elo = new Date(invoices.all[i].time)
+                link.title = "faktura za " + invoices.all[i].what + " -> " + elo.getFullYear() + "/" + elo.getMonth() + "/"  + elo.getDay() + " " + elo.getHours() + ":" + elo.getMinutes() + ":" + elo.getSeconds()
+                link.href = "http://localhost:4567/invoice?name=" + invoices.all[i].title + "&path=invoices"
+                aAll.append(link)
+            }
+            let aYear = document.getElementById("aYear")
+            aYear.innerHTML = ""
+            for (let i = 0; i < invoices.year.length; i++) {
+                let link = document.createElement("a")
+                link.innerText = "pobierz"
+                let elo = new Date(invoices.year[i].time)
+                link.title = "faktura za " + invoices.year[i].what + " -> " + elo.getFullYear() + "/" + elo.getMonth() + "/"  + elo.getDay() + " " + elo.getHours() + ":" + elo.getMinutes() + ":" + elo.getSeconds()
+                link.href = "http://localhost:4567/invoice?name=" + invoices.year[i].title + "&path=invoices"
+                aYear.append(link)
+            }
+            let aValue = document.getElementById("aValue")
+            aValue.innerHTML = ""
+            for (let i = 0; i < invoices.value.length; i++) {
+                let link = document.createElement("a")
+                link.innerText = "pobierz"
+                let elo = new Date(invoices.value[i].time)
+                link.title = "faktura za " + invoices.value[i].what + " -> " + elo.getFullYear() + "/" + elo.getMonth() + "/"  + elo.getDay() + " " + elo.getHours() + ":" + elo.getMinutes() + ":" + elo.getSeconds()
+                link.href = "http://localhost:4567/invoice?name=" + invoices.value[i].title + "&path=invoices"
+                aValue.append(link)
+            }
             for (let i = 0; i < tab.length; i++) {
                 let el = document.createElement("li")
                 let id = document.createElement("div")
@@ -221,7 +260,20 @@
             if (!response.ok)
                 return response.status
             else
-                return await response.json() // response.json
+                return await response.json()
+
+        }
+        fetchGet2 = async () => {
+            const options = {
+                method: "GET",
+            };
+
+            let response = await fetch("/invoices", options)
+
+            if (!response.ok)
+                return response.status
+            else
+                return await response.json()
 
         }
     </script>

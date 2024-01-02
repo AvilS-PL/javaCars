@@ -73,7 +73,7 @@
                     let temp = document.createElement("a")
                     temp.innerText = "Pobierz fakturkę"
                     temp.style.margin = "auto"
-                    temp.href = "http://localhost:4567/invoice?uuid=" + tab[i].uuid
+                    temp.href = "http://localhost:4567/invoice?name=" + tab[i].uuid + "&path=katalog"
                     el.append(temp)
                 }
                 l.appendChild(el)
