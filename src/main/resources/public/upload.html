@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadanka</title>
+    <style>
+        #drag {
+            width: 80%;
+            height: 400px;
+            border: 3px dotted black;
+            margin: auto;
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            overflow-y: scroll;
+        }
+        #divek {
+            width: 150px;
+            height: 100px;
+            position: relative;
+            margin: 20px;
+        }
+
+        #xik{
+            width: 20px;
+            height: 20px;
+            border-radius: 0 0 0 5px;
+
+            background-color: red;
+            position: absolute;
+            right: 0;
+            top: 0;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+        }
+
+        #xik:hover {
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/">index</a>
+        <a href="/cars.html">edit/update cars</a>
+        <a href="/admin.html">generative invoice</a>
+        <a href="/search.html">search invoices</a>
+    </header>
+    <main style="display: flex">
+        <div style="margin: auto"><button id="bt1">Przypisz do samochodu</button></div>
+        <div id="drag">
+            <p style="color: grey; margin: auto">Przeciągnij tutaj</p>
+        </div>
+    </main>
+    <script defer>
+        document.getElementById("bt1").addEventListener("click", ()=> send())
+        let uuid = localStorage.getItem("uuid")
+        let drag = document.getElementById("drag")
+        let tab = []
+        document.querySelector("html").ondragover = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        document.querySelector("html").ondrop = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        drag.ondragenter = function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
+        drag.ondragover = function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            drag.style.backgroundColor = "#99999955"
+        }
+
+        drag.ondragleave = function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            drag.style.backgroundColor = "white"
+
+        }
+        drag.ondrop = async function (e) {
+            drag.style.backgroundColor = "white"
+
+            e.stopPropagation();
+            e.preventDefault();
+
+            const files = e.dataTransfer.files;
+
+            const fd = new FormData();
+
+            for (let i = 0; i < files.length; i++) {
+                fd.append('file', files[i]);
+            }
+
+            let odp = await fetchUpload(fd)
+            if(odp.length >0) {
+                for (let i = 0; i < odp.length; i++) {
+                    //ZMIANA CZY DUPLIKATY
+                    // if (!tab.includes(odp[i])){
+                        tab.push(odp[i])
+                    // }
+                }
+            }
+            generate()
+
+        }
+
+        generate = () => {
+            drag.innerHTML = ""
+            for (let i = 0; i < tab.length; i++) {
+                let divek = document.createElement("div")
+                divek.id = "divek"
+                let img = document.createElement("img")
+                img.style.maxWidth = "100%"
+                img.style.maxWidth = "100%"
+                img.src = "thumb?name="+ tab[i]
+                let x = document.createElement("div")
+                x.id = "xik"
+                x.innerText = "x"
+
+                x.addEventListener("click", ()=> deleter(i))
+
+                divek.append(img, x)
+                drag.append(divek)
+            }
+
+            if (tab.length === 0) {
+                drag.innerHTML = "<p style=\"color: grey; margin: auto\">Przeciągnij tutaj</p>"
+            }
+        }
+
+        deleter = (which) => {
+            tab.splice(which, 1)
+            generate()
+        }
+
+        send = async () => {
+            const data = JSON.stringify({
+                uuid: uuid,
+                tab: tab
+            })
+            const options = {
+                method: "POST",
+                body: data
+            };
+
+            let response = await fetch("/savePics", options)
+
+            if (!response.ok) {
+                return response.status
+            }
+            else {
+                return await response.json()
+            }
+        }
+
+        fetchUpload = async (fd) => {
+            const options = {
+                method: "POST",
+                body: fd
+            };
+
+            let response = await fetch("/sendPics", options)
+
+            if (!response.ok) {
+                return response.status
+            }
+            else {
+                return await response.json()
+            }
+        }
+    </script>
+</body>
+</html>

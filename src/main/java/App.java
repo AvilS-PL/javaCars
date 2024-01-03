@@ -6,10 +6,10 @@ import com.itextpdf.text.pdf.PdfWriter;
 import spark.Request;
 import spark.Response;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
+import javax.servlet.http.Part;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -71,7 +71,90 @@ class App {
         post("/invoiceYear", (req,res)-> invoiceYear(req,res));
         post("/invoiceValue", (req,res)-> invoiceValue(req,res));
         get("/invoices", (req,res)-> getInvoices(req,res));
+        post("/sendPics", (req,res)-> sendPics(req,res));
+        post("/savePics", (req,res)-> savePics(req,res));
+        get("/thumb", (req,res)-> thumb(req,res));
+        get("/photos", (req,res)-> photos(req,res));
 
+    }
+
+    private static Object photos(Request req, Response res) {
+        ArrayList<String> photos = null;
+        for (int i = 0; i < cars.size(); i++) {
+            if (cars.get(i).getUuid().equals(req.queryParams("uuid"))) {
+                photos = cars.get(i).getPhotos();
+                break;
+            }
+        }
+        res.type("application/json");
+        return gson.toJson(photos);
+    }
+
+    private static Object thumb(Request req, Response res) {
+        File file = new File("images/" + req.queryParams("name"));
+        res.type("image/jpeg");
+
+        OutputStream outputStream = null;
+        try {
+            outputStream = res.raw().getOutputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            outputStream.write(Files.readAllBytes(file.toPath()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            outputStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        res.type("application/json");
+        return gson.toJson("image sended");
+    }
+
+    private static Object savePics(Request req, Response res) {
+        for (int i = 0; i < cars.size(); i++) {
+            if (cars.get(i).getUuid().equals(gson.fromJson(req.body(), Price.class).getUuid())){
+                ArrayList<String> saveTab = gson.fromJson(req.body(), Price.class).getTab();
+                for (int j = 0; j < saveTab.size(); j++) {
+                    if (!cars.get(i).getPhotos().contains(saveTab.get(j))) cars.get(i).getPhotos().add(saveTab.get(j));
+                }
+                System.out.println(cars.get(i).getPhotos());
+                break;
+                // cars.get(i).setPhotos(saveTab)
+            }
+        }
+        res.type("application/json");
+        return gson.toJson("image saved to car");
+    }
+
+    private static Object sendPics(Request req, Response res) {
+        req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/images"));
+        ArrayList<String> nazwy = new ArrayList<>();
+        try {
+            for(Part p : req.raw().getParts()){
+                InputStream inputStream = p.getInputStream();
+
+                byte[] bytes = inputStream.readAllBytes();
+                //MOŻNA UUID ABY BYŁY DUPLIKATY
+                String fileName = p.getSubmittedFileName();
+                FileOutputStream fos = new FileOutputStream("images/" + fileName);
+                fos.write(bytes);
+                fos.close();
+                if (!nazwy.contains(fileName)) {
+                    nazwy.add(fileName);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
+        }
+        res.type("application/json");
+        return gson.toJson(nazwy);
     }
 
     private static Object getInvoices(Request req, Response res) {

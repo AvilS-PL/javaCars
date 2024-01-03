@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadanka</title>
+    <style>
+        #divek {
+            width: 300px;
+            height: 200px;
+            position: relative;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body onload="generate()">
+    <header>
+        <a href="/">index</a>
+        <a href="/cars.html">edit/update cars</a>
+        <a href="/admin.html">generative invoice</a>
+        <a href="/search.html">search invoices</a>
+    </header>
+    <main id="main" style="display: flex; flex-wrap: wrap">
+
+    </main>
+    <script defer>
+        let main = document.getElementById("main")
+        let uuid = localStorage.getItem("uuid")
+        let tab = []
+        generate = async () => {
+            main.innerHTML = ""
+            tab = await fetchGet()
+            for (let i = 0; i < tab.length; i++) {
+                let divek = document.createElement("div")
+                divek.id = "divek"
+                let img = document.createElement("img")
+                img.style.maxWidth = "100%"
+                img.style.maxWidth = "100%"
+                img.src = "thumb?name="+ tab[i]
+
+                divek.append(img)
+                main.append(divek)
+            }
+        }
+
+        fetchGet = async () => {
+            const options = {
+                method: "GET"
+            };
+
+            let response = await fetch("/photos?uuid="+uuid, options)
+
+            if (!response.ok) {
+                return response.status
+            }
+            else {
+                return await response.json()
+            }
+        }
+    </script>
+</body>
+</html>

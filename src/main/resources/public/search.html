@@ -10,6 +10,10 @@
             flex-direction: row;
         }
 
+        a{
+            margin-right: 5px;
+        }
+
         #faktury {
             width: 20%;
             display: flex;
@@ -103,7 +107,13 @@
             }
         }
 
-        document.getElementById("fValue").addEventListener("click", () => fetchFakturaValue())
+        document.getElementById("fValue").addEventListener("click", () => {
+            if (document.getElementById("minimum").value.length == 0 || document.getElementById("maximum").value.length == 0) {
+               alert("podaj wartości")
+            } else {
+                fetchFakturaValue()
+            }
+        })
         fetchFakturaValue = async () => {
             const data = JSON.stringify({
                 min: document.getElementById("minimum").value,

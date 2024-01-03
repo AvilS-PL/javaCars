@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Zadanka - cars</title>
+    <style>
+    </style>
 </head>
 <body onload="start()">
     <header>
@@ -48,9 +50,11 @@
                 let color = document.createElement("div")
                 let edit = document.createElement("button")
                 let remove = document.createElement("button")
+                let upload = document.createElement("a")
+                let gallery = document.createElement("a")
 
                 el.style.display = "flex"
-                el.style.width = "80%"
+                el.style.width = "100%"
                 el.style.marginBottom = "20px"
                 id.innerText = tab[i].id
                 id.style.margin ="auto"
@@ -84,7 +88,21 @@
                 remove.style.margin="auto"
                 remove.addEventListener("click", ()=> deleter(tab[i]))
 
-                el.append(id, uuid, model, year, airbags, color, edit, remove)
+                upload.style.margin = "auto"
+                upload.innerText = "upload"
+                upload.href = "http://localhost:4567/upload.html"
+                upload.addEventListener("click",  ()=> {
+                    localStorage.setItem("uuid", tab[i].uuid);
+                })
+
+                gallery.style.margin = "auto"
+                gallery.innerText = "gallery"
+                gallery.href = "http://localhost:4567/gallery.html"
+                gallery.addEventListener("click",  ()=> {
+                    localStorage.setItem("uuid", tab[i].uuid);
+                })
+
+                el.append(id, uuid, model, year, airbags, color, edit, remove, upload, gallery)
                 l.appendChild(el)
             }
         }

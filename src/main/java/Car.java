@@ -5,7 +5,7 @@ public class Car {
     private ArrayList<AirBag> airbags;
     private CustomDate buy;
 
-//    private ArrayList<String> photos;
+    private ArrayList<String> photos;
 
     private boolean vat;
     private double value, pVat;
@@ -18,6 +18,7 @@ public class Car {
         this.airbags = airbags;
         this.color = color;
         this.vat = false;
+        this.photos = new ArrayList<>();
     }
 
     public void setId(int id) {
@@ -44,9 +45,9 @@ public class Car {
         this.buy = buy;
     }
 
-//    public void setPhotos(ArrayList<String> photos) {
-//        this.photos = photos;
-//    }
+    public void setPhotos(ArrayList<String> photos) {
+        this.photos = photos;
+    }
 
     public void setValue(double value) {
         this.value = value;
@@ -82,5 +83,9 @@ public class Car {
 
     public double getpVat() {
         return pVat;
+    }
+
+    public ArrayList<String> getPhotos() {
+        return photos;
     }
 }
