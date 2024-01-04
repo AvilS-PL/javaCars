@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zadanka</title>
+    <style>
+        * {margin:0}
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+            width: 100%;
+            height: 95vh;
+        }
+
+        #buttons {
+            width: 10%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #photoFrame {
+            width: 90%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #image {
+            max-width: 90%;
+            max-height: 90%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
+</head>
+<body onload="generate()">
+    <header>
+        <a href="/">index</a>
+        <a href="/cars.html">edit/update cars</a>
+        <a href="/admin.html">generative invoice</a>
+        <a href="/search.html">search invoices</a>
+    </header>
+    <main id="main">
+        <div id="buttons">
+            <button onclick="fetchEdit('rotate')">Rotate</button>
+            <button onclick="fetchEdit('flipH')">flip Horizontal</button>
+            <button onclick="fetchEdit('flipV')">flip Vertical</button>
+            <button>crop</button>
+        </div>
+        <div id="photoFrame">
+            <div id="image"></div>
+        </div>
+    </main>
+    <script defer>
+        let name = new URLSearchParams(window.location.search).get("name")
+        let img = document.getElementById("image")
+        generate = async () => {
+            img.style.backgroundImage = `url("/thumb?name=${name}&rand=${Math.random()}")`
+            let image = new Image();
+            image.src = "/thumb?name=" + name + "&rand=" + Math.random()
+            image.onload = function() {
+                img.style.backgroundImage = image
+                img.style.width = image.width + "px"
+                img.style.height = image.height + "px"
+            };
+        }
+
+        fetchEdit = async (x) => {
+            const data = JSON.stringify({
+                name: name,
+                action: x,
+            })
+            const options = {
+                method: "POST",
+                body: data
+            }
+            let response = await fetch("/editPic", options)
+
+            if (!response.ok) {
+                return response.status
+            }
+            else {
+                generate()
+                return await response.json()
+            }
+        }
+    </script>
+</body>
+</html>

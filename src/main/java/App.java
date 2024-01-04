@@ -75,7 +75,26 @@ class App {
         post("/savePics", (req,res)-> savePics(req,res));
         get("/thumb", (req,res)-> thumb(req,res));
         get("/photos", (req,res)-> photos(req,res));
+        post("/editPic", (req,res)-> editPic(req,res));
 
+    }
+
+    private static Object editPic(Request req, Response res) {
+        switch (gson.fromJson(req.body(), Edit.class).getAction()) {
+            case "rotate":
+                Edit.rotate(gson.fromJson(req.body(), Edit.class).getName());
+                break;
+            case "flipH":
+                Edit.flipH(gson.fromJson(req.body(), Edit.class).getName());
+                break;
+            case "flipV":
+                Edit.flipV(gson.fromJson(req.body(), Edit.class).getName());
+                break;
+        }
+
+
+        res.type("application/json");
+        return gson.toJson("done editing");
     }
 
     private static Object photos(Request req, Response res) {
@@ -122,7 +141,6 @@ class App {
                 for (int j = 0; j < saveTab.size(); j++) {
                     if (!cars.get(i).getPhotos().contains(saveTab.get(j))) cars.get(i).getPhotos().add(saveTab.get(j));
                 }
-                System.out.println(cars.get(i).getPhotos());
                 break;
                 // cars.get(i).setPhotos(saveTab)
             }
@@ -140,7 +158,10 @@ class App {
 
                 byte[] bytes = inputStream.readAllBytes();
                 //MOŻNA UUID ABY BYŁY DUPLIKATY
-                String fileName = p.getSubmittedFileName();
+                UUID uuid2 = Generators.randomBasedGenerator().generate();
+//                String[] exte = p.getSubmittedFileName().split("\\.");
+//                String fileName = uuid2 +"."+ exte[exte.length-1];
+                String fileName = uuid2 +".jpg";
                 FileOutputStream fos = new FileOutputStream("images/" + fileName);
                 fos.write(bytes);
                 fos.close();

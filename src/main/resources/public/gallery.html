@@ -34,10 +34,16 @@
                 divek.id = "divek"
                 let img = document.createElement("img")
                 img.style.maxWidth = "100%"
-                img.style.maxWidth = "100%"
+                img.style.maxHeight = "100%"
                 img.src = "thumb?name="+ tab[i]
+                let link = document.createElement("a")
+                link.href = "imager.html?name=" + tab[i]
+                link.style.position = "absolute"
+                link.style.top = "0"
+                link.style.right = "0"
+                link.innerText = "edit"
 
-                divek.append(img)
+                divek.append(img, link)
                 main.append(divek)
             }
         }

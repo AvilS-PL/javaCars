@@ -146,7 +146,7 @@
                 link.innerText = "pobierz"
                 let elo = new Date(invoices.all[i].time)
                 link.title = "faktura za " + invoices.all[i].what + " -> " + elo.getFullYear() + "/" + elo.getMonth() + "/"  + elo.getDay() + " " + elo.getHours() + ":" + elo.getMinutes() + ":" + elo.getSeconds()
-                link.href = "http://localhost:4567/invoice?name=" + invoices.all[i].title + "&path=invoices"
+                link.href = "invoice?name=" + invoices.all[i].title + "&path=invoices"
                 aAll.append(link)
             }
             let aYear = document.getElementById("aYear")
@@ -156,7 +156,7 @@
                 link.innerText = "pobierz"
                 let elo = new Date(invoices.year[i].time)
                 link.title = "faktura za " + invoices.year[i].what + " -> " + elo.getFullYear() + "/" + elo.getMonth() + "/"  + elo.getDay() + " " + elo.getHours() + ":" + elo.getMinutes() + ":" + elo.getSeconds()
-                link.href = "http://localhost:4567/invoice?name=" + invoices.year[i].title + "&path=invoices"
+                link.href = "invoice?name=" + invoices.year[i].title + "&path=invoices"
                 aYear.append(link)
             }
             let aValue = document.getElementById("aValue")
@@ -166,7 +166,7 @@
                 link.innerText = "pobierz"
                 let elo = new Date(invoices.value[i].time)
                 link.title = "faktura za " + invoices.value[i].what + " -> " + elo.getFullYear() + "/" + elo.getMonth() + "/"  + elo.getDay() + " " + elo.getHours() + ":" + elo.getMinutes() + ":" + elo.getSeconds()
-                link.href = "http://localhost:4567/invoice?name=" + invoices.value[i].title + "&path=invoices"
+                link.href = "invoice?name=" + invoices.value[i].title + "&path=invoices"
                 aValue.append(link)
             }
             for (let i = 0; i < tab.length; i++) {
