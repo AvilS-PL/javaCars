@@ -86,6 +86,7 @@
         </div>
     </main>
     <script defer>
+        document.getElementById("bt1").disabled = true
         document.getElementById("bt1").addEventListener("click", () => send())
         let uuid = localStorage.getItem("uuid")
         let drag = document.getElementById("drag")
@@ -146,6 +147,7 @@
         generate = () => {
             drag.innerHTML = ""
             for (let i = 0; i < tab.length; i++) {
+                document.getElementById("bt1").disabled = false
                 let divek = document.createElement("div")
                 divek.id = "divek"
                 let img = document.createElement("img")
@@ -164,6 +166,7 @@
             }
 
             if (tab.length === 0) {
+                document.getElementById("bt1").disabled = true
                 drag.innerHTML = "<p style=\"color: grey; margin: auto\">Przeciągnij tutaj</p>"
             }
         }
@@ -191,6 +194,9 @@
             else {
                 let temp = await response.json()
                 alert(temp)
+                drag.innerHTML = "<p style=\"color: grey; margin: auto\">Przeciągnij tutaj</p>"
+                document.getElementById("bt1").disabled = true
+                tab = []
                 return temp
             }
         }

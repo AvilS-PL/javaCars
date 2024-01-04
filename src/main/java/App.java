@@ -90,6 +90,14 @@ class App {
             case "flipV":
                 Edit.flipV(gson.fromJson(req.body(), Edit.class).getName());
                 break;
+            case "crop":
+                Edit.crop(gson.fromJson(req.body(), Edit.class).getName(),
+                        gson.fromJson(req.body(), Edit.class).getX(),
+                        gson.fromJson(req.body(), Edit.class).getY(),
+                        gson.fromJson(req.body(), Edit.class).getW(),
+                        gson.fromJson(req.body(), Edit.class).getH()
+                        );
+                break;
         }
 
 

@@ -35,6 +35,9 @@
         header a:hover {
             background-color: #835f52;
         }
+        dialog {
+            margin: auto;
+        }
     </style>
 </head>
 
@@ -53,11 +56,16 @@
     <dialog id="d1">
         <input type="text" name="model" id="model" value="model">
         <select name="rok" id="rok">
+            <option value="2000">2000</option>
             <option value="2001">2001</option>
             <option value="2002">2002</option>
             <option value="2003">2003</option>
             <option value="2004">2004</option>
             <option value="2005">2005</option>
+            <option value="2006">2006</option>
+            <option value="2007">2007</option>
+            <option value="2008">2008</option>
+            <option value="2009">2009</option>
         </select><br>
         <button id="d1-button">anuluj</button>
         <button id="d1-send">zapisz</button>
@@ -147,6 +155,7 @@
 
         editor = (element) => {
             document.getElementById("d1").showModal()
+            console.log(element)
             document.getElementById("rok").value = element.year
             document.getElementById("model").value = element.model
             which = element.uuid

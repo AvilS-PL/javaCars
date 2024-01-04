@@ -63,7 +63,7 @@ public class Invoice {
         table.addCell(new PdfPCell(new Phrase("wartość", cellBold)));
         double fullValue = 0;
         for (int i = 0; i < list.size(); i++) {
-            table.addCell(new PdfPCell(new Phrase(String.valueOf(i), cellNormal)));
+            table.addCell(new PdfPCell(new Phrase(String.valueOf(i+1), cellNormal)));
             double val = list.get(i).getValue();
             double perVat = list.get(i).getpVat();
             table.addCell(new PdfPCell(new Phrase(String.valueOf(val), cellNormal)));

@@ -18,22 +18,7 @@
             flex-direction: row;
             width: 100%;
             height: calc(100vh - 50px);
-        }
-
-        #buttons {
-            width: 15%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        #photoFrame {
-            width: 80%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            overflow: hidden;
         }
 
         header {
@@ -61,6 +46,43 @@
         header a:hover {
             background-color: #835f52;
         }
+
+        #buttons {
+            width: 15%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #photoFrame {
+            width: 80%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #image {
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            background-position: center;
+            position: relative;
+        }
+
+        #full {
+            width: 100%;
+            height: 100%;
+
+            border: 3px dotted black;
+        }
+
+        #sel {
+            position: absolute;
+            background-color: #00000044;
+        }
+
     </style>
 </head>
 
@@ -76,23 +98,120 @@
             <button onclick="fetchEdit('rotate')">Rotate</button>
             <button onclick="fetchEdit('flipH')">flip Horizontal</button>
             <button onclick="fetchEdit('flipV')">flip Vertical</button>
-            <button>crop</button>
+            <button onclick="fetchCrop()">crop</button>
         </div>
         <div id="photoFrame">
+            <div id="image">
+                <div id="full">
+
+                </div>
+                <div id="sel"></div>
+            </div>
         </div>
     </main>
     <script defer>
         let name = new URLSearchParams(window.location.search).get("name")
-        let img = document.createElement("img")
+        let image = document.getElementById("image")
+        let photoFrame = document.getElementById("photoFrame")
+        let tWid = 0
+        let tHei = 0
+        let wid = 0
+        let hei = 0
+        let ratio = 1
         generate = async () => {
+            image.style.backgroundImage = `url("/thumb?name=${name}&rand=${Math.random()}")`
+            let img = new Image()
             img.src = "/thumb?name=" + name + "&rand=" + Math.random()
-            img.style.maxWidth = "100%"
-            img.style.maxHeight = "100%"
-            img.style.border = "3px dotted black"
-            document.getElementById("photoFrame").append(img)
+
+            img.onload = function(){
+                tWid = img.naturalWidth
+                tHei = img.naturalHeight
+                sizeWork()
+            };
+        }
+        window.addEventListener("resize", () => sizeWork());
+
+        sizeWork = () => {
+            wid = photoFrame.offsetWidth - 30
+            hei = photoFrame.offsetHeight - 30
+            ratio = hei/tHei
+            if (tWid * ratio > wid) {
+                ratio = wid/tWid
+            }
+            console.log("ratio: " +ratio+ " | w: " + tWid + " | h: "+ tHei)
+            image.style.width = tWid * ratio + "px"
+            image.style.height = tHei * ratio + "px"
+        }
+
+        sel = document.getElementById("sel")
+        let startX = 0
+        let startY = 0
+        let endX = 0
+        let endY = 0
+
+        image.onmousedown = function (e) {
+            let rect = image.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            sel.style.left = Math.round(startX) + "px"
+            sel.style.top = Math.round(startY) + "px"
+            sel.style.height = "0px"
+            sel.style.width = "0px"
+            image.addEventListener("mousemove", movingMouse)
+
+        }
+        photoFrame.onmouseup = function (e) {
+            image.removeEventListener("mousemove", movingMouse)
+        }
+
+        movingMouse = (e) => {
+            let rect = image.getBoundingClientRect();
+            endX = e.clientX - rect.left;
+            endY = e.clientY - rect.top;
+            if (endX - startX > 0 ) {
+                sel.style.width = Math.round(endX - startX) + "px"
+            } else {
+                sel.style.width = Math.round(startX - endX) + "px"
+                sel.style.left = Math.round(endX) + "px"
+            }
+            if (endY - startY > 0 ) {
+                sel.style.height = Math.round(endY - startY) + "px"
+            } else {
+                sel.style.height = Math.round(startY - endY) + "px"
+                sel.style.top = Math.round(endY) + "px"
+            }
+        }
+
+        fetchCrop = async () => {
+            if (sel.offsetWidth != 0 && sel.offsetHeight != 0){
+            const data = JSON.stringify({
+                name: name,
+                action: "crop",
+                x: Math.round((startX < endX ? startX : endX)/ratio),
+                y: Math.round((startY < endY ? startY : endY)/ratio),
+                w: Math.round(sel.offsetWidth/ratio),
+                h: Math.round(sel.offsetHeight/ratio)
+            })
+            const options = {
+                method: "POST",
+                body: data
+            }
+            let response = await fetch("/editPic", options)
+
+            if (!response.ok) {
+                return response.status
+            }
+            else {
+                sel.style.width = "0px"
+                sel.style.height = "0px"
+                generate()
+                return await response.json()
+            }
+            }
         }
 
         fetchEdit = async (x) => {
+
             const data = JSON.stringify({
                 name: name,
                 action: x,
