@@ -1,11 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Zadanka - cars</title>
     <style>
+        * {
+            margin: 0;
+            font-family: Roboto;
+        }
+
+        header {
+            height: 50px;
+            width: 100vw;
+            background-color: #5D4037;
+            display: flex;
+            align-items: center;
+        }
+
+        header a {
+            margin-left: 20px;
+            width: 200px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: #795548;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: 300ms;
+        }
+
+        header a:hover {
+            background-color: #835f52;
+        }
     </style>
 </head>
+
 <body onload="start()">
     <header>
         <a href="/">index</a>
@@ -34,13 +66,13 @@
     <script defer>
         let l = document.getElementById("list")
         let which = ""
-        document.getElementById("d1-button").addEventListener("click", ()=> editorClose())
-        document.getElementById("d1-send").addEventListener("click", ()=> editorSend())
+        document.getElementById("d1-button").addEventListener("click", () => editorClose())
+        document.getElementById("d1-send").addEventListener("click", () => editorSend())
 
         start = async () => {
             l.innerHTML = ""
             let tab = await fetchGet()
-            for (let i = 0; i < tab.length ; i++) {
+            for (let i = 0; i < tab.length; i++) {
                 let el = document.createElement("li")
                 let id = document.createElement("div")
                 let uuid = document.createElement("div")
@@ -57,48 +89,48 @@
                 el.style.width = "100%"
                 el.style.marginBottom = "20px"
                 id.innerText = tab[i].id
-                id.style.margin ="auto"
+                id.style.margin = "auto"
 
                 uuid.innerText = tab[i].uuid
-                uuid.style.margin ="auto"
+                uuid.style.margin = "auto"
 
                 model.innerText = tab[i].model
-                model.style.margin ="auto"
+                model.style.margin = "auto"
 
                 year.innerText = tab[i].year
-                year.style.margin ="auto"
+                year.style.margin = "auto"
 
                 let text = ""
                 for (let j = 0; j < tab[i].airbags.length; j++) {
                     text += tab[i].airbags[j].description + ":" + tab[i].airbags[j].val + "<br>"
                 }
                 airbags.innerHTML = text
-                airbags.style.margin ="auto"
+                airbags.style.margin = "auto"
 
                 color.style.width = "20px"
                 color.style.height = "20px"
                 color.style.backgroundColor = tab[i].color
-                color.style.margin ="auto"
+                color.style.margin = "auto"
                 color.style.border = "1px solid black"
 
                 edit.innerText = "EDIT"
-                edit.style.margin="auto"
-                edit.addEventListener("click", ()=> editor(tab[i]))
+                edit.style.margin = "auto"
+                edit.addEventListener("click", () => editor(tab[i]))
                 remove.innerText = "REMOVE"
-                remove.style.margin="auto"
-                remove.addEventListener("click", ()=> deleter(tab[i]))
+                remove.style.margin = "auto"
+                remove.addEventListener("click", () => deleter(tab[i]))
 
                 upload.style.margin = "auto"
                 upload.innerText = "upload"
                 upload.href = "upload.html"
-                upload.addEventListener("click",  ()=> {
+                upload.addEventListener("click", () => {
                     localStorage.setItem("uuid", tab[i].uuid);
                 })
 
                 gallery.style.margin = "auto"
                 gallery.innerText = "gallery"
                 gallery.href = "gallery.html"
-                gallery.addEventListener("click",  ()=> {
+                gallery.addEventListener("click", () => {
                     localStorage.setItem("uuid", tab[i].uuid);
                 })
 
@@ -136,7 +168,7 @@
                 method: "GET",
             };
 
-            let response = await fetch("/get", options )
+            let response = await fetch("/get", options)
 
             if (!response.ok)
                 return response.status
@@ -182,11 +214,12 @@
                 return response.status
             }
             else {
-                return  await response.json()
+                return await response.json()
             }
 
         }
 
     </script>
 </body>
+
 </html>

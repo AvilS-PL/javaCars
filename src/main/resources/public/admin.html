@@ -1,11 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Zadanka</title>
     <style>
+        * {
+            margin: 0;
+            font-family: Roboto;
+        }
+
+        header {
+            height: 50px;
+            width: 100vw;
+            background-color: #5D4037;
+            display: flex;
+            align-items: center;
+        }
+
+        header a {
+            margin-left: 20px;
+            width: 200px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: #795548;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: 300ms;
+        }
+
+        header a:hover {
+            background-color: #835f52;
+        }
     </style>
 </head>
+
 <body onload="start()">
     <header>
         <a href="/">index</a>
@@ -20,13 +52,13 @@
         </ul>
     </main>
     <script defer>
-        document.getElementById("klik").addEventListener("click", ()=> fetchPostAsync())
+        document.getElementById("klik").addEventListener("click", () => fetchPostAsync())
         let l = document.getElementById("list")
 
         start = async () => {
             l.innerHTML = ""
             let tab = await fetchGet()
-            for (let i = 0; i < tab.length ; i++) {
+            for (let i = 0; i < tab.length; i++) {
                 let el = document.createElement("li")
                 let id = document.createElement("div")
                 let uuid = document.createElement("div")
@@ -40,23 +72,23 @@
                 el.style.width = "100%"
                 el.style.marginBottom = "20px"
                 id.innerText = tab[i].id
-                id.style.margin ="auto"
+                id.style.margin = "auto"
 
                 uuid.innerText = tab[i].uuid
-                uuid.style.margin ="auto"
+                uuid.style.margin = "auto"
 
                 model.innerText = tab[i].model
-                model.style.margin ="auto"
+                model.style.margin = "auto"
 
                 year.innerText = tab[i].year
-                year.style.margin ="auto"
+                year.style.margin = "auto"
 
                 let text = ""
                 for (let j = 0; j < tab[i].airbags.length; j++) {
                     text += tab[i].airbags[j].description + ":" + tab[i].airbags[j].val + "<br>"
                 }
                 airbags.innerHTML = text
-                airbags.style.margin ="auto"
+                airbags.style.margin = "auto"
 
                 color.style.width = "20px"
                 color.style.height = "20px"
@@ -65,8 +97,8 @@
                 color.style.border = "1px solid black"
 
                 create.innerText = "generuj fakturkę VAT"
-                create.style.margin="auto"
-                create.addEventListener("click", ()=> creater(tab[i]))
+                create.style.margin = "auto"
+                create.addEventListener("click", () => creater(tab[i]))
 
                 el.append(id, uuid, model, year, airbags, color, create)
                 if (tab[i].vat) {
@@ -126,7 +158,7 @@
                 method: "GET",
             };
 
-            let response = await fetch("/get", options )
+            let response = await fetch("/get", options)
 
             if (!response.ok)
                 return response.status
@@ -136,4 +168,5 @@
         }
     </script>
 </body>
+
 </html>

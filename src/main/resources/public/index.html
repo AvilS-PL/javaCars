@@ -1,14 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Zadanka</title>
     <style>
-        input[type=text], input[type=color], button, select {
+        * {
+            margin: 0;
+            font-family: Roboto;
+        }
+
+        input[type=text],
+        input[type=color],
+        button,
+        select {
             width: 120px;
         }
+
+        header {
+            height: 50px;
+            width: 100vw;
+            background-color: #5D4037;
+            display: flex;
+            align-items: center;
+        }
+
+        header a {
+            margin-left: 20px;
+            width: 200px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: #795548;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: 300ms;
+        }
+
+        header a:hover {
+            background-color: #835f52;
+        }
+
+        .flex {}
     </style>
 </head>
+
 <body>
     <header>
         <a href="/">index</a>
@@ -50,10 +88,10 @@
                 year: document.getElementById("rok").value,
                 color: document.getElementById("kolor").value,
                 airbags: [
-                    {description: "kierowca", val:document.getElementById("k").checked},
-                    {description: "pasazer", val:document.getElementById("p").checked},
-                    {description: "tylna kanapa", val:document.getElementById("t").checked},
-                    {description: "boczne z tyłu", val:document.getElementById("b").checked}
+                    { description: "kierowca", val: document.getElementById("k").checked },
+                    { description: "pasazer", val: document.getElementById("p").checked },
+                    { description: "tylna kanapa", val: document.getElementById("t").checked },
+                    { description: "boczne z tyłu", val: document.getElementById("b").checked }
                 ]
             })
 
@@ -72,4 +110,5 @@
         }
     </script>
 </body>
+
 </html>

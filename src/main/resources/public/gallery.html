@@ -1,17 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Zadanka</title>
     <style>
+        * {
+            margin: 0;
+            font-family: Roboto;
+        }
+
         #divek {
-            width: 300px;
-            height: 200px;
             position: relative;
             margin: 20px;
         }
+
+        header {
+            height: 50px;
+            width: 100%;
+            background-color: #5D4037;
+            display: flex;
+            align-items: center;
+        }
+
+        header a {
+            margin-left: 20px;
+            width: 200px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: #795548;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: 300ms;
+        }
+
+        header a:hover {
+            background-color: #835f52;
+        }
     </style>
 </head>
+
 <body onload="generate()">
     <header>
         <a href="/">index</a>
@@ -33,15 +64,20 @@
                 let divek = document.createElement("div")
                 divek.id = "divek"
                 let img = document.createElement("img")
-                img.style.maxWidth = "100%"
-                img.style.maxHeight = "100%"
-                img.src = "thumb?name="+ tab[i]
+                img.style.maxWidth = "300px"
+                img.style.maxHeight = "200px"
+                img.src = "thumb?name=" + tab[i]
                 let link = document.createElement("a")
                 link.href = "imager.html?name=" + tab[i]
                 link.style.position = "absolute"
                 link.style.top = "0"
                 link.style.right = "0"
                 link.innerText = "edit"
+                link.style.backgroundColor = "red"
+                link.style.color = "white"
+                link.style.textDecoration = "none"
+                link.style.padding = "3px"
+                link.style.borderRadius = "0 0 0 5px"
 
                 divek.append(img, link)
                 main.append(divek)
@@ -53,7 +89,7 @@
                 method: "GET"
             };
 
-            let response = await fetch("/photos?uuid="+uuid, options)
+            let response = await fetch("/photos?uuid=" + uuid, options)
 
             if (!response.ok) {
                 return response.status
@@ -64,4 +100,5 @@
         }
     </script>
 </body>
+
 </html>

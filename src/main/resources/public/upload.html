@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Zadanka</title>
     <style>
+        * {
+            margin: 0;
+            font-family: Roboto;
+        }
+
         #drag {
             width: 80%;
             height: 400px;
@@ -14,14 +20,13 @@
             flex-wrap: wrap;
             overflow-y: scroll;
         }
+
         #divek {
-            width: 150px;
-            height: 100px;
             position: relative;
             margin: 20px;
         }
 
-        #xik{
+        #xik {
             width: 20px;
             height: 20px;
             border-radius: 0 0 0 5px;
@@ -39,8 +44,34 @@
             cursor: pointer;
         }
 
+        header {
+            height: 50px;
+            width: 100%;
+            background-color: #5D4037;
+            display: flex;
+            align-items: center;
+        }
+
+        header a {
+            margin-left: 20px;
+            width: 200px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: #795548;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: 300ms;
+        }
+
+        header a:hover {
+            background-color: #835f52;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <a href="/">index</a>
@@ -55,7 +86,7 @@
         </div>
     </main>
     <script defer>
-        document.getElementById("bt1").addEventListener("click", ()=> send())
+        document.getElementById("bt1").addEventListener("click", () => send())
         let uuid = localStorage.getItem("uuid")
         let drag = document.getElementById("drag")
         let tab = []
@@ -100,11 +131,11 @@
             }
 
             let odp = await fetchUpload(fd)
-            if(odp.length >0) {
+            if (odp.length > 0) {
                 for (let i = 0; i < odp.length; i++) {
                     //ZMIANA CZY DUPLIKATY
                     // if (!tab.includes(odp[i])){
-                        tab.push(odp[i])
+                    tab.push(odp[i])
                     // }
                 }
             }
@@ -118,14 +149,15 @@
                 let divek = document.createElement("div")
                 divek.id = "divek"
                 let img = document.createElement("img")
-                img.style.maxWidth = "100%"
-                img.style.maxHeight = "100%"
-                img.src = "thumb?name="+ tab[i]
+                img.style.maxWidth = "150px"
+                img.style.maxHeight = "100px"
+                img.style.objectFit = "cover"
+                img.src = "thumb?name=" + tab[i]
                 let x = document.createElement("div")
                 x.id = "xik"
                 x.innerText = "x"
 
-                x.addEventListener("click", ()=> deleter(i))
+                x.addEventListener("click", () => deleter(i))
 
                 divek.append(img, x)
                 drag.append(divek)
@@ -180,4 +212,5 @@
         }
     </script>
 </body>
+
 </html>
