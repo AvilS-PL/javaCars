@@ -264,7 +264,6 @@ class App {
 
                 Document document = new Document();
                 String path = "katalog/" + cars.get(i).getUuid() + ".pdf";
-//                String path = "katalog/plik.pdf";
                 try {
                     PdfWriter.getInstance(document, new FileOutputStream(path));
                 } catch (DocumentException e) {
@@ -311,14 +310,23 @@ class App {
                 try {
                     img = Image.getInstance("src/main/resources/public/templateCars/"+cars.get(i).getModel()+".jpg");
                 } catch (BadElementException e) {
-                    throw new RuntimeException(e);
+//                    throw new RuntimeException(e);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+//                    throw new RuntimeException(e);
                 }
-                try {
-                    document.add(img);
-                } catch (DocumentException e) {
-                    throw new RuntimeException(e);
+                if (img != null) {
+                    try {
+                        document.add(img);
+                    } catch (DocumentException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    Paragraph info = new Paragraph("obrazek dla tego modelu nie znaleziony");
+                    try {
+                        document.add(info);
+                    } catch (DocumentException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 document.close();
@@ -383,9 +391,8 @@ class App {
     private static Object addCar(Request req, Response res) {
         liczba++;
         Car c = gson.fromJson(req.body(), Car.class);
-
+        c.setPhotos(new ArrayList<>());
         UUID uuid = Generators.randomBasedGenerator().generate();
-
         c.setId(liczba);
         c.setUuid(uuid.toString());
         cars.add(c);
