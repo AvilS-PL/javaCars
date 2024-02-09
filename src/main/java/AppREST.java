@@ -10,6 +10,10 @@ import response.ResponseStatus;
 import spark.Request;
 import spark.Response;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 
@@ -24,12 +28,36 @@ public class AppREST {
         get("/api/photos/:id", (req, res) -> getPhotoById(req,res));
         get("/api/photos/photo/:name", (req, res) -> getPhotoByName(req,res));
         delete("api/photos/:id", (req,res) -> deletePhotoById(req,res));
-//        post("/api/users", (req, res) -> addUser(req,res));
+        put("api/photos/:id", (req,res) -> editPhotoById(req,res));
+        get("/api/photos/data/:id", (req, res) -> getDataPhoto(req,res));
+    }
+
+    private static Object getDataPhoto(Request req, Response res) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.type("image/jpeg");
+
+        boolean answer = photoService.getDataPhoto(req.params(":id"), res);
+
+        System.out.println(answer);
+        if (answer) return res.raw();
+        else {
+            res.type("application/json");
+            return gson.toJson(new ResponseEntity(ResponseStatus.ERROR, "nie znaleziono zdjęcia"));
+        }
+    }
+
+    private static Object editPhotoById(Request req, Response res) {
+        boolean answer = photoService.editPhotoById(req.params(":id"), gson.fromJson(req.body(), Photo.class).getName());
+
+        res.header("Access-Control-Allow-Origin", "*");
+        res.type("application/json");
+        if (answer) return gson.toJson(new ResponseEntity(ResponseStatus.SUCCESS, "zmieniono nazwę"));
+        else return gson.toJson(new ResponseEntity(ResponseStatus.ERROR, "nie znaleziono zdjęcia lub nie zmieniono nazwy"));
     }
 
     private static Object deletePhotoById(Request req, Response res) {
         boolean answer = photoService.deletePhotoById(req.params(":id"));
-        System.out.println(answer);
+
         res.header("Access-Control-Allow-Origin", "*");
         res.type("application/json");
         if (answer) return gson.toJson(new ResponseEntity(ResponseStatus.SUCCESS, "usunięto zdjęcie"));

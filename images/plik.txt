@@ -1,0 +1,1 @@
+plik mający na celu jedynie zapełnienie folderu aby nie został on usunięty podczas wysyłania wetransfer-em
